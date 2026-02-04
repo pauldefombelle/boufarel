@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Boufarel</title>
+    <style>
+        /* Supprime les marges et le scroll */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Empêche le scroll */
+            background-color: white;
+            display: flex;
+            justify-content: center; /* Centrage horizontal */
+            align-items: center;     /* Centrage vertical */
+            user-select: none;       /* Empêche la sélection de texte */
+            -webkit-user-select: none;
+        }
+
+        img {
+            max-width: 90vw;  /* Image adaptée à l'écran mobile/PC */
+            max-height: 90vh;
+            pointer-events: none; /* Rend l'image "cliquable" comme du vide */
+            display: block;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;"> <img src="boufarel.png" alt="">
+</body>
+</html>
