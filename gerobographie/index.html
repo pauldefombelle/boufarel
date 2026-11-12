@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>gérobographie</title>
+<style>
+:root{--ink:#251f21;--ink2:#6b6264;--raised:#f7f3f2;--teal:#73a89a;--hair:#e3dcdc}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#ffffff;color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:0 20px 64px}
+.hero{padding:30px 0;max-width:760px}
+.fact{color:var(--teal);font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:lowercase;margin:0 0 10px}
+.hero h1{font-size:clamp(36px,7vw,64px);line-height:1.08;letter-spacing:-.04em;margin:0 0 14px;font-weight:700}
+.hero p{max-width:610px;color:var(--ink2);margin:0}
+h2{font-size:22px;letter-spacing:-.02em;margin:0 0 20px}
+.movie{display:block;width:100%;max-height:540px;aspect-ratio:20/11;background:var(--ink);border-radius:24px;object-fit:contain}
+.caption{color:var(--ink2);font-size:13px;margin:10px 2px 0}
+.gallery-section{margin-top:48px}
+.gallery-intro{color:var(--ink2);margin:0 0 28px}
+.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 14px}
+.art{display:block;min-width:0;background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--ink2);font:inherit}
+.paper{height:230px;display:flex;align-items:center;justify-content:center;background:var(--raised);padding:10px;border-radius:12px;transition:transform .18s ease}
+.paper img{width:100%;height:100%;object-fit:contain}
+.art-number{display:block;margin-top:8px;font-size:12px;letter-spacing:.04em}
+.art:hover .paper{transform:translateY(-3px)}
+.art:focus-visible{outline:2px solid var(--teal);outline-offset:5px;border-radius:12px}
+.closing{margin-top:56px;padding-top:20px;border-top:1px solid var(--hair);color:var(--ink2);font-size:14px}
+@media(min-width:768px){.gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:32px 24px}.paper{height:350px;padding:18px}.hero{padding-top:40px;padding-bottom:40px}.gallery-section{margin-top:64px}}
+@media(max-width:350px){.paper{height:190px;padding:7px}.gallery{gap:18px 10px}}
+.viewer{position:fixed;inset:0;background:rgba(20,16,18,.94);display:flex;align-items:center;justify-content:center;z-index:50;touch-action:none}
+.viewer[hidden]{display:none}
+.viewer img{max-width:92vw;max-height:82vh;object-fit:contain;border-radius:8px;background:#fff}
+.vbtn{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.vbtn:hover{background:rgba(255,255,255,.18)}
+.vprev{left:12px}.vnext{right:12px}
+.vclose{position:absolute;top:14px;right:14px;width:44px;height:44px;transform:none;font-size:18px}
+.vcount{position:absolute;top:24px;left:20px;color:rgba(255,255,255,.85);font-size:13px;letter-spacing:.05em}
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <p class="fact">mars 2020</p>
+    <h1>gérobographie</h1>
+    <p>Un projet confiné mené par Belén (4 ans et demi), Joseph (6 ans) et Gabrielle (8 ans) en mars 2020</p>
+  </div>
+
+  <section>
+    <h2>Le projet, raconté par ses créateurs</h2>
+    <video class="movie" controls preload="metadata" playsInline poster="photos/presentation.jpg" src="photos/presentation.mp4" aria-label="Présentation du projet gérobographie par les enfants"></video>
+    <p class="caption">La vidéo de présentation · 1 min 41</p>
+  </section>
+
+  <div class="gallery-section">
+    <section>
+      <h2>Les dessins des participants</h2>
+      <p class="gallery-intro"><span>30 robots, autant de façons de voir le monde.</span></p>
+      <div class="gallery" id="gallery"></div>
+    </section>
+  </div>
+
+  <p class="closing">gérobographie · Souvenirs d'un printemps confiné.</p>
+</main>
+
+<div class="viewer" id="viewer" hidden role="dialog" aria-label="Visionneuse de dessins">
+  <span class="vcount" id="vcount"></span>
+  <img id="vimg" alt="">
+  <button class="vbtn vprev" id="vprev" aria-label="Dessin précédent">&#8249;</button>
+  <button class="vbtn vnext" id="vnext" aria-label="Dessin suivant">&#8250;</button>
+  <button class="vbtn vclose" id="vclose" aria-label="Fermer">&#10005;</button>
+</div>
+
+<script>
+(function(){
+  var N = 30;
+  var gallery = document.getElementById('gallery');
+  var viewer = document.getElementById('viewer');
+  var vimg = document.getElementById('vimg');
+  var vcount = document.getElementById('vcount');
+  var current = 0;
+  function src(i){ return 'photos/' + String(i).padStart(2,'0') + '.webp'; }
+  function alt(i){ return 'Dessin de robot n\u00B0 ' + (i+1) + ' du projet g\u00E9robographie'; }
+  for (var i = 0; i < N; i++) {
+    (function(i){
+      var b = document.createElement('button');
+      b.className = 'art';
+      b.setAttribute('aria-label', 'Agrandir le dessin ' + (i+1));
+      var paper = document.createElement('div');
+      paper.className = 'paper';
+      var img = document.createElement('img');
+      img.src = src(i);
+      img.alt = alt(i);
+      if (i >= 6) img.loading = 'lazy';
+      paper.appendChild(img);
+      var num = document.createElement('span');
+      num.className = 'art-number';
+      num.textContent = String(i+1).padStart(2,'0');
+      b.appendChild(paper);
+      b.appendChild(num);
+      b.addEventListener('click', function(){ open(i); });
+      gallery.appendChild(b);
+    })(i);
+  }
+  function show(i){
+    current = (i + N) % N;
+    vimg.src = src(current);
+    vimg.alt = alt(current);
+    vcount.textContent = (current+1) + ' / ' + N;
+  }
+  function open(i){ show(i); viewer.hidden = false; document.body.style.overflow = 'hidden'; }
+  function close(){ viewer.hidden = true; document.body.style.overflow = ''; }
+  document.getElementById('vprev').addEventListener('click', function(){ show(current-1); });
+  document.getElementById('vnext').addEventListener('click', function(){ show(current+1); });
+  document.getElementById('vclose').addEventListener('click', close);
+  viewer.addEventListener('click', function(e){ if (e.target === viewer) close(); });
+  document.addEventListener('keydown', function(e){
+    if (viewer.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowLeft') show(current-1);
+    else if (e.key === 'ArrowRight') show(current+1);
+  });
+  var tx = null;
+  viewer.addEventListener('touchstart', function(e){ tx = e.touches[0].clientX; }, {passive:true});
+  viewer.addEventListener('touchend', function(e){
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx;
+    if (dx > 50) show(current-1); else if (dx < -50) show(current+1);
+    tx = null;
+  }, {passive:true});
+})();
+</script>
+</body>
+</html>
